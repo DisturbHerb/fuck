@@ -97,4 +97,4 @@ function getMousePos(event) {
 
 // event listeners that trigger when an piece is dragged and when a piece is dropped. or, at least, they're meant to!
 document.addEventListener("ondragstart", getMousePos);
-document.addEventListener("ondrop", getMousePos);
+document.addEventListener("ondragover", getMousePos);
