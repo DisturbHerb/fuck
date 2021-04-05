@@ -12,7 +12,7 @@ drawPiece = function(position, pieceType, pieceColor) { // file and rank start a
 	var file = position % ranks, rank = Math.floor(position/ranks);
 	var pieceImage = pieceType + pieceColor +  ".svg";
 	// this next part's gonna be a long one.
-	var pieceImageString = "<image src=\'" + pieceImage + "\' draggable=\'true\' ondragstart=\'getMousePos()\' ondrop=\'getMousePos()\' class=\'piece\' id="+ position +" style='width: " + tileSize + "px; height: " + tileSize + "px; transform: translate(" + (file * tileSize) + "px," + (rank * tileSize) + "px);'>";
+	var pieceImageString = "<image src=\'assets/" + pieceImage + "\' draggable=\'true\' ondragstart=\'getMousePos()\' class=\'piece\' id="+ position +" style='width: " + tileSize + "px; height: " + tileSize + "px; transform: translate(" + (file * tileSize) + "px," + (rank * tileSize) + "px);'>";
 	$("#chesspieces").append(pieceImageString);
 }
 
