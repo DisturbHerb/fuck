@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1' />
+		<link rel="stylesheet" type="text/css" href="chess.css">
+		<script src="jquery-3.6.0.min.js"></script>
+	</head>
+<body>
+	<div class="chessboard">
+		<div id="chesspieces"></div>
+		<canvas id="chessboard" width="480" height="480"></canvas> 
+		<script src="chess.js"></script>
+	</div>
+	<div class="debug fuck" style="text-align:center;">
+		<input type="text" id="fenInput" value="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR">
+		<button onclick="loadFEN()">Load FEN</button>
+		<button onclick="clearPieces()">Clear Pieces</button>
+	</div>
+</body>
+</html>
