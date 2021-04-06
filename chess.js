@@ -7,12 +7,15 @@ var whiteSide = "W", blackSide = "B";
 var notationTextStyle = "10px", weirdnessMultiplier = "5" // for whatever reason, some offsets have to be divided by this so it looks less weird. dunno why.
 
 var pieceList = Array.apply(null, Array(files*ranks)); // sets array of length 64 with all values set to null
+var fromSpace = null, toSpace = null;
+var selectionColor = "rgba(34, 139, 34, 0.3)", lastMoveColor = "rgba(255, 255, 0, 0.3)";
+var moveMade = 0;
 
 drawPiece = function(position, pieceType, pieceColor) { // file and rank start at zero, small-brain.
 	var file = position % ranks, rank = Math.floor(position/ranks);
 	var pieceImage = pieceType + pieceColor +  ".svg";
 	// this next part's gonna be a long one.
-	var pieceImageString = "<image src=\'assets/" + pieceImage + "\' draggable=\'true\' ondragstart=\'getMousePos()\' class=\'piece\' id="+ position +" style='width: " + tileSize + "px; height: " + tileSize + "px; transform: translate(" + (file * tileSize) + "px," + (rank * tileSize) + "px);'>";
+	var pieceImageString = "<image src=\'assets/" + pieceImage + "\' class=\'piece\' id="+ position +" style='width: " + tileSize + "px; height: " + tileSize + "px; transform: translate(" + (file * tileSize) + "px," + (rank * tileSize) + "px);'>";
 	$("#chesspieces").append(pieceImageString);
 }
 
@@ -42,13 +45,13 @@ clearPieces = function(){document.getElementById("chesspieces").innerHTML = "";}
 
 // This function is primarily for debugging and testing rendering capabilities, FEN will not be used as the representation of game pieces on the board.
 loadFEN = function() { // FUCK YEAAAH YOU CAN IMPORT FEN STRINGS NOW!
-	clearPieces();
-	var positionalFEN = document.getElementById("fenInput").value;
+	var positionalFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 	var selectedFile = 0, selectedRank = 0, selectedPieceType = 0, selectedPieceColor = 0;
 	pieceList = Array.apply(null, Array(files*ranks));
-	if(positionalFEN == ""){
+	/* var positionalFEN = document.getElementById("fenInput").value;
+	 if(positionalFEN == ""){
 		positionalFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-	}
+	} */
 	var fenBoard = positionalFEN.split("");
 	for(var i = 0; i < fenBoard.length; i++){
 		if(fenBoard[i] == "/"){ // go to next rank at end of file
@@ -67,6 +70,7 @@ loadFEN = function() { // FUCK YEAAAH YOU CAN IMPORT FEN STRINGS NOW!
 }
 
 initialisePieces = function() { // function for initialising chess pieces after... every... move.
+	clearPieces();
 	for(var i = 0; i < pieceList.length; i++){
 		if(pieceList[i] != null) {
 			var singlePieceArray = pieceList[i].split("");
@@ -78,11 +82,62 @@ initialisePieces = function() { // function for initialising chess pieces after.
 window.onload = function(){
 	drawBoard();
 	loadFEN();
+	// event listeners for clicking
+	document.addEventListener("click", processMovement);
 }
 
 // MORE DEBUG AND TESTING SHIT
+// oh god oh fuck CLEAN UP YOUR MESS
+function processMovement(event){ // fired on-click
+	var selectedSpace = getClickedPos(event);
+	if(!Number.isInteger(selectedSpace)){ // if clicked space isn't valid
+		return;
+	}
+	if(!Number.isInteger(fromSpace)){ // if no fromSpace has been selected prior, set clicked square to fromSpace
+		fromSpace = selectedSpace;
+		if(!pieceList[fromSpace]){ // if clicked space is empty, return and set fromSpace to null
+			fromSpace = null;
+			return;
+		}
+		drawSingleSquare(parseInt(fromSpace), "selectionSquares", selectionColor); // draw selection square at fromSpace position
+		return;
+	} else if(!Number.isInteger(toSpace)){ // if no toSpace has been selected, which, hm...
+		toSpace = selectedSpace;
+		clearCanvas("selectionSquares"); // clear selectionSquares canvas
+		if(toSpace == fromSpace){ // if toSpace and fromSpace are the same, revert everything
+			fromSpace = null, toSpace = null;
+			return;
+		}
+		pieceList[toSpace] = pieceList[fromSpace]; // change the piece positions in the array
+		pieceList[fromSpace] = null;
+		handleLastMoveSquare(fromSpace, toSpace); // draw highlights for last move made
+		initialisePieces(); // redraw pieces on the board
+		fromSpace = null, toSpace = null; // reset variables, time to start this again
+	}
+}
+
+function handleLastMoveSquare(lastFrom, lastTo){
+	clearCanvas("lastMoveSquares")
+	drawSingleSquare(lastFrom, "lastMoveSquares", lastMoveColor);
+	drawSingleSquare(lastTo, "lastMoveSquares", lastMoveColor);
+}
+
+function drawSingleSquare(squarePosition, selectedCanvas, selectedColor){
+	var drawSquareFile = squarePosition % ranks, drawSquareRank = Math.floor(squarePosition/ranks);
+	var selectionCanvas = document.getElementById(selectedCanvas);
+	var selectionctx = selectionCanvas.getContext('2d');
+	selectionctx.fillStyle = selectedColor;
+	selectionctx.fillRect((tileSize*drawSquareFile), (tileSize*drawSquareRank), tileSize, tileSize);
+}
+
+function clearCanvas(clrCanvas){
+	var clearCanvas = document.getElementById(clrCanvas);
+	var clearctx = clearCanvas.getContext('2d');
+	clearctx.clearRect(0, 0, clearCanvas.width, clearCanvas.height);
+}
+
 // get mouse position with event listeners
-function getMousePos(event) {
+function getClickedPos(event) {
 	event = event || window.event;
 	var boardX = (event.pageX - $('#chessboard').offset().left);
 	var boardY = (event.pageY - $('#chessboard').offset().top);
@@ -92,9 +147,12 @@ function getMousePos(event) {
 	var clickedFile = Math.floor(boardX/tileSize);
 	var clickedRank = Math.floor(boardY/tileSize);
 	var clickedSpace = ((clickedRank * files) + clickedFile);
-	console.log(clickedSpace);
+	return clickedSpace;
 }
 
+// for my mental health i'm going to avoid these goddamn click-drag things FUCK
+
 // event listeners that trigger when an piece is dragged and when a piece is dropped. or, at least, they're meant to!
-document.addEventListener("ondragstart", getMousePos);
-document.addEventListener("ondragover", getMousePos);
+/* document.addEventListener("ondragstart", getMousePos);
+document.addEventListener("ondragover", (event) => {event.preventDefault();});
+document.addEventListener("ondrop", getMousePos); */

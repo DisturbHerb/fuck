@@ -6,15 +6,17 @@
 		<script src="jquery-3.6.0.min.js"></script>
 	</head>
 <body>
-	<div class="chessboard" ondragover='getMousePos()'>
+	<div class="chessboard">
 		<div id="chesspieces"></div>
+		<canvas id="selectionSquares" width="480" height="480"></canvas> 
+		<canvas id="lastMoveSquares" width="480" height="480"></canvas>
 		<canvas id="chessboard" width="480" height="480"></canvas> 
 		<script src="chess.js"></script>
 	</div>
 	<div class="debug fuck" style="text-align:center;">
-		<input type="text" id="fenInput" value="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR">
+		<!-- <input type="text" id="fenInput" value="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR">
 		<button onclick="loadFEN()">Load FEN</button>
-		<button onclick="clearPieces()">Clear Pieces</button>
+		<button onclick="clearPieces()">Clear Pieces</button> -->
 	</div>
 </body>
 </html>
