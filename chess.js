@@ -4,7 +4,7 @@ var notationOffset = 10;
 var notationColor;
 var white = "#f0ce99", black = "#8a613f";
 var whiteSide = "W", blackSide = "B";
-var notationTextStyle = "10px", weirdnessMultiplier = "5" // for whatever reason, some offsets have to be divided by this so it looks less weird. dunno why.
+var notationTextStyle = "10px", weirdnessMultiplier = "5"; // for whatever reason, some offsets have to be divided by this so it looks less weird. dunno why.
 
 var pieceList = Array.apply(null, Array(files*ranks)); // sets array of length 64 with all values set to null
 var fromSpace = null, toSpace = null;
@@ -15,7 +15,7 @@ drawPiece = function(position, pieceType, pieceColor) { // file and rank start a
 	var file = position % ranks, rank = Math.floor(position/ranks);
 	var pieceImage = pieceType + pieceColor +  ".svg";
 	// this next part's gonna be a long one.
-	var pieceImageString = "<image src=\'assets/" + pieceImage + "\' class=\'piece\' id="+ position +" style='width: " + tileSize + "px; height: " + tileSize + "px; transform: translate(" + (file * tileSize) + "px," + (rank * tileSize) + "px);'>";
+	var pieceImageString = "<image src=\'assets/" + pieceImage + "\' class=\'piece\' dragstart=\'(event) => {event.preventDefault();})\' id="+ position +" style='width: " + tileSize + "px; height: " + tileSize + "px; transform: translate(" + (file * tileSize) + "px," + (rank * tileSize) + "px);'>";
 	$("#chesspieces").append(pieceImageString);
 }
 
@@ -83,7 +83,7 @@ window.onload = function(){
 	drawBoard();
 	loadFEN();
 	// event listeners for clicking
-	document.addEventListener("click", processMovement);
+	//document.addEventListener("click", processMovement);
 }
 
 // MORE DEBUG AND TESTING SHIT
@@ -153,6 +153,11 @@ function getClickedPos(event) {
 // for my mental health i'm going to avoid these goddamn click-drag things FUCK
 
 // event listeners that trigger when an piece is dragged and when a piece is dropped. or, at least, they're meant to!
-/* document.addEventListener("ondragstart", getMousePos);
-document.addEventListener("ondragover", (event) => {event.preventDefault();});
-document.addEventListener("ondrop", getMousePos); */
+document.addEventListener("dragstart", (event) => {
+	processMovement();
+});
+document.addEventListener("dragover", (event) => {event.preventDefault();});
+document.addEventListener("drop", (event) => {
+    processMovement();
+    event.preventDefault();
+});

@@ -10,7 +10,7 @@
 		<div id="chesspieces"></div>
 		<canvas id="selectionSquares" width="480" height="480"></canvas> 
 		<canvas id="lastMoveSquares" width="480" height="480"></canvas>
-		<canvas id="chessboard" width="480" height="480"></canvas> 
+		<canvas id="chessboard" width="480" height="480" ondrop="(event) => {processMovement();event.preventDefault();}" ondragover="(event) => {event.preventDefault();}"></canvas> 
 		<script src="chess.js"></script>
 	</div>
 	<div class="debug fuck" style="text-align:center;">
